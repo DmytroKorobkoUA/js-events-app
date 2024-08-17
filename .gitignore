@@ -73,11 +73,26 @@ web_modules/
 .yarn-integrity
 
 # dotenv environment variable files
+# General
 .env
-.env.development.local
-.env.test.local
-.env.production.local
 .env.local
+
+# Backend specific
+backend/.env
+backend/.env.development
+backend/.env.production
+
+# Frontend specific
+frontend/.env
+frontend/.env.development
+frontend/.env.production
+
+# Exclude environment files from specific folders
+# (Optional) You can uncomment these lines if you want to include specific env files
+# !backend/.env.development
+# !backend/.env.production
+# !frontend/.env.development
+# !frontend/.env.production
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -128,3 +143,5 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+.idea/
