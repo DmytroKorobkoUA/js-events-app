@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { EventsModule } from './events/events.module';
 import { User } from './users/user.entity';
 import { Event } from './events/event.entity';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -30,8 +32,10 @@ import { Event } from './events/event.entity';
       synchronize: true,
     }),
     TypeOrmModule.forFeature([User, Event]),
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService],
 })
 export class AppModule {}

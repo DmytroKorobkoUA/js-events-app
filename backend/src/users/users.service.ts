@@ -18,8 +18,23 @@ export class UsersService {
         return this.usersRepository.findOne({ where: { id } });
     }
 
-    createUser(userData: Partial<User>): Promise<User> {
+    findByEmail(email: string): Promise<User | undefined> {
+        return this.usersRepository.findOne({ where: { email } });
+    }
+
+    create(userData: Partial<User>): Promise<User> {
         const user = this.usersRepository.create(userData);
+        return this.usersRepository.save(user);
+    }
+
+    async update(id: number, updateData: Partial<User>): Promise<User | null> {
+        const user = await this.usersRepository.preload({
+            id,
+            ...updateData,
+        });
+        if (!user) {
+            return null;
+        }
         return this.usersRepository.save(user);
     }
 }
