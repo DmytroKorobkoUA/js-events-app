@@ -7,7 +7,7 @@ export const fetchEvents = createAsyncThunk(
         const apiUrl = process.env.NEXT_PUBLIC_API_URL;
         const response = await axios.get(`${apiUrl}/events?city=${city}&date=${date}`);
 
-        return response.data._embedded.events;
+        return response.data;
     }
 );
 
