@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/hooks/useAuth';
 import Navbar from '@/components/Navbar';
+import Link from 'next/link';
 
 const Home = () => {
     const router = useRouter();
@@ -20,15 +21,15 @@ const Home = () => {
             <h1>Welcome to the Events App</h1>
             {isAuthenticated ? (
                 <div>
-                    <p>You're already logged in. Feel free to explore the application.</p>
+                    <p>You are already logged in. Feel free to explore the application.</p>
                     <p>Here you can browse and search for upcoming events in various cities.</p>
-                    <p><a href="/events">Go to Events</a></p>
+                    <p><Link href="/events">Go to Events</Link></p>
                 </div>
             ) : (
                 <div>
                     <p>Please log in or register to start exploring events.</p>
-                    <p><a href="/login">Login</a></p>
-                    <p><a href="/register">Register</a></p>
+                    <p><Link href="/login">Login</Link></p>
+                    <p><Link href="/register">Register</Link></p>
                 </div>
             )}
         </div>
