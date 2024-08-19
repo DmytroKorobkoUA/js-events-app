@@ -15,5 +15,8 @@ export class Event {
     city: string;
 
     @Column()
+    eventType: string;
+
+    @Column()
     date: string;
 }

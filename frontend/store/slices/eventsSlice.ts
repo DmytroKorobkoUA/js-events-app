@@ -1,13 +1,40 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-export const fetchEvents = createAsyncThunk(
-    'events/fetchEvents',
-    async ({ city, date }: { city: string; date: string }) => {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-        const response = await axios.get(`${apiUrl}/events?city=${city}&date=${date}`);
+interface FetchEventsFilters {
+    city: string;
+    date: string;
+    eventType?: string;
+}
 
-        return response.data;
+interface EventResponse {
+    events: any[];
+}
+
+interface FetchEventsError {
+    message: string;
+}
+
+export const fetchEvents = createAsyncThunk<any[], FetchEventsFilters, { rejectValue: FetchEventsError }>(
+    'events/fetchEvents',
+    async (filters: FetchEventsFilters, thunkAPI) => {
+        const { city, date, eventType } = filters;
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        const queryParams = new URLSearchParams({
+            city,
+            date,
+            eventType: eventType || '',
+        }).toString();
+
+        try {
+            const response = await axios.get<any[]>(`${apiUrl}/events?${queryParams}`);
+            return response.data;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                return thunkAPI.rejectWithValue({ message: error.response?.data?.message || 'An error occurred' });
+            }
+            return thunkAPI.rejectWithValue({ message: 'An unexpected error occurred' });
+        }
     }
 );
 
@@ -38,7 +65,7 @@ const eventsSlice = createSlice({
             })
             .addCase(fetchEvents.rejected, (state, action) => {
                 state.status = 'failed';
-                state.error = action.error.message || null;
+                state.error = action.payload?.message || 'An unexpected error occurred';
             });
     },
 });
