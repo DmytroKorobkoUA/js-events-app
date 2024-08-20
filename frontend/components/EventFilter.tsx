@@ -1,6 +1,7 @@
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
-import Select from 'react-select';
+import Select, { StylesConfig } from 'react-select';
+import styles from '@/styles/eventFilter.module.css';
 import axiosInstance from '../axiosInstance';
 
 const getTomorrowDate = (): string => {
@@ -14,8 +15,39 @@ interface OptionType {
     label: string;
 }
 
+const customStyles: StylesConfig<OptionType, false> = {
+    control: (provided) => ({
+        ...provided,
+        backgroundColor: '#444',
+        borderColor: '#555',
+        minHeight: '40px',
+        boxShadow: 'none',
+        borderRadius: '5px',
+        padding: 0,
+    }),
+    menu: (provided) => ({
+        ...provided,
+        backgroundColor: '#444',
+        color: '#f5f5f5',
+        borderRadius: '5px',
+    }),
+    option: (provided, state) => ({
+        ...provided,
+        backgroundColor: state.isFocused ? '#555' : '#444',
+        color: '#f5f5f5',
+    }),
+    singleValue: (provided) => ({
+        ...provided,
+        color: '#f5f5f5',
+    }),
+    dropdownIndicator: (provided) => ({
+        ...provided,
+        color: '#f5f5f5',
+    }),
+};
+
 const EventFilter = ({ onFilter }: { onFilter: (filters: any) => void }) => {
-    const [city, setCity] = useState<string>('');
+    const [city, setCity] = useState<string>('London');
     const [date, setDate] = useState<string>(getTomorrowDate());
     const [eventType, setEventType] = useState<string>('');
     const [eventTypesOptions, setEventTypesOptions] = useState<OptionType[]>([]);
@@ -27,7 +59,10 @@ const EventFilter = ({ onFilter }: { onFilter: (filters: any) => void }) => {
                 const response = await axiosInstance.get('/events/filters');
                 const { eventTypes } = response.data;
 
-                setEventTypesOptions(eventTypes.map((type: string) => ({ value: type, label: type })));
+                setEventTypesOptions([
+                    { value: '', label: 'Any types' },
+                    ...eventTypes.map((type: string) => ({ value: type, label: type })),
+                ]);
             } catch (error) {
                 if (axios.isAxiosError(error)) {
                     setErrorMessage(error.response?.data?.message || 'An error occurred');
@@ -40,24 +75,10 @@ const EventFilter = ({ onFilter }: { onFilter: (filters: any) => void }) => {
         fetchFilters();
     }, []);
 
-    const handleCityChange = async (selectedOption: OptionType | null) => {
-        const selectedCity = selectedOption ? selectedOption.value : '';
-        setCity(selectedCity);
-
-        try {
-            await axiosInstance.get('/events', {
-                params: { city: selectedCity, date, eventType }
-            });
-            setErrorMessage(null);
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                setErrorMessage(error.response?.data?.message || 'An error occurred');
-            } else {
-                setErrorMessage('An unexpected error occurred');
-            }
-        }
-
-        onFilter({ city: selectedCity, date, eventType });
+    const handleCityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newCity = e.target.value;
+        setCity(newCity);
+        onFilter({ city: newCity, date, eventType });
     };
 
     const handleEventTypeChange = (selectedOption: OptionType | null) => {
@@ -73,13 +94,14 @@ const EventFilter = ({ onFilter }: { onFilter: (filters: any) => void }) => {
     };
 
     return (
-        <div>
+        <div className={styles['filter-container']}>
             <h2>Filter Events</h2>
             <input
                 type="text"
                 placeholder="Enter City"
                 value={city}
-                onChange={(e) => handleCityChange({ value: e.target.value, label: e.target.value })}
+                onChange={handleCityChange}
+                className={styles['filter-input']}
             />
             {errorMessage && <p>{errorMessage}</p>}
             <Select
@@ -87,13 +109,16 @@ const EventFilter = ({ onFilter }: { onFilter: (filters: any) => void }) => {
                 options={eventTypesOptions}
                 onChange={handleEventTypeChange}
                 value={eventTypesOptions.find(option => option.value === eventType) || null}
+                className={styles['filter-select']}
+                classNamePrefix="react-select"
+                styles={customStyles}
             />
             <input
                 type="date"
                 value={date}
                 onChange={handleDateChange}
+                className={styles['filter-input']}
             />
-            <button onClick={() => onFilter({ city, date, eventType })}>Apply Filter</button>
         </div>
     );
 };

@@ -24,7 +24,7 @@ const Register = () => {
     };
 
     return (
-        <div>
+        <div className="auth-container">
             <h2>Register</h2>
             <input
                 type="text"

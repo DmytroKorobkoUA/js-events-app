@@ -30,6 +30,8 @@ const Events = () => {
         eventType: '',
     });
 
+    const [displayFilters, setDisplayFilters] = useState<Filters>(filters);
+
     const handleFilter = (newFilters: Filters) => {
         setFilters(newFilters);
     };
@@ -38,7 +40,12 @@ const Events = () => {
         if (isAuthenticated) {
             dispatch(fetchEvents(filters));
         }
-    }, [dispatch, isAuthenticated, filters]);
+    }, [dispatch, isAuthenticated]);
+
+    const applyFilters = () => {
+        setDisplayFilters(filters); // Обновляем отображаемые фильтры
+        dispatch(fetchEvents(filters));
+    };
 
     const handleErrorMessage = () => {
         if (eventStatus === 'failed') {
@@ -48,20 +55,24 @@ const Events = () => {
     };
 
     const filterMessage = () => {
-        const { city, date, eventType } = filters;
+        const { city, date, eventType } = displayFilters;
         let message = `Showing events in ${city} on ${date}`;
 
         if (eventType) message += `, for ${eventType} events`;
 
-            return message;
+        return message;
     };
 
     return (
-        <div>
+        <div className="events-container">
             <Navbar />
             <h1>Events</h1>
 
             <EventFilter onFilter={handleFilter} />
+
+            <button onClick={applyFilters} disabled={eventStatus === 'loading'}>
+                Apply Filter
+            </button>
 
             <p>{filterMessage()}</p>
             {eventStatus === 'loading' && <p>Loading...</p>}

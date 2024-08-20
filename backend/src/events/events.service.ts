@@ -26,6 +26,8 @@ export class EventsService {
 
         const cachedDbEvents = await this.eventRepository.find({
             where: queryConditions,
+            take: 20,
+            order: { date: 'DESC' },
         });
 
         if (cachedDbEvents.length > 0) {
@@ -75,11 +77,14 @@ export class EventsService {
                 this.httpService.get(eventTypeUrl).pipe(map(response => response.data))
             );
 
-            const eventTypes: string[] = eventTypesResponse._embedded?.classifications.map((type: any) => type.segment?.name).filter((name: string | null) => name !== null) || [];
+            const eventTypes: string[] = eventTypesResponse._embedded?.classifications
+                .map((type: any) => type.segment?.name)
+                .filter((name: string | undefined | null) => name !== undefined && name !== null && name.trim() !== '') || [];
 
             return eventTypes;
         } catch (error) {
             throw error;
         }
     }
+
 }

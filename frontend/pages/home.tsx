@@ -16,7 +16,7 @@ const Home = () => {
     // }, [isAuthenticated, router]);
 
     return (
-        <div>
+        <div className="home-container">
             <Navbar />
             <h1>Welcome to the Events App</h1>
             {isAuthenticated ? (
