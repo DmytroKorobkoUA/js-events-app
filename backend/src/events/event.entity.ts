@@ -19,4 +19,22 @@ export class Event {
 
     @Column()
     date: string;
+
+    @Column({ nullable: true })
+    description?: string;
+
+    @Column({ nullable: true })
+    venue?: string;
+
+    @Column({ nullable: true })
+    url?: string;
+
+    @Column({ nullable: true })
+    imageUrl?: string;
+
+    @Column({ nullable: true })
+    priceRange?: string;
+
+    @Column({ nullable: true })
+    audience?: string;
 }

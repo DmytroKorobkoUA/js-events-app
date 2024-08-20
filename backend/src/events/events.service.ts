@@ -55,6 +55,13 @@ export class EventsService {
                 event.city = city;
                 event.date = date;
                 event.eventType = eventType || '';
+                event.description = eventData.info || '';
+                event.venue = eventData._embedded?.venues[0]?.name || '';
+                event.url = eventData.url || '';
+                event.imageUrl = eventData.images[0]?.url || '';
+                event.priceRange = eventData.priceRanges?.map((price: any) => price.type + ': ' + price.currency + price.min + '-' + price.max).join(', ') || '';
+                event.audience = eventData._embedded?.attractions?.map((attr: any) => attr.name).join(', ') || '';
+
                 return event;
             });
 

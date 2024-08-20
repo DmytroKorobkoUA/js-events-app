@@ -1,6 +1,21 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+export interface Event {
+    id: number;
+    eventId: string;
+    name: string;
+    city: string;
+    eventType: string;
+    date: string;
+    description?: string;
+    venue?: string;
+    url?: string;
+    imageUrl?: string;
+    priceRange?: string;
+    audience?: string;
+}
+
 interface FetchEventsFilters {
     city: string;
     date: string;
@@ -8,14 +23,14 @@ interface FetchEventsFilters {
 }
 
 interface EventResponse {
-    events: any[];
+    events: Event[];
 }
 
 interface FetchEventsError {
     message: string;
 }
 
-export const fetchEvents = createAsyncThunk<any[], FetchEventsFilters, { rejectValue: FetchEventsError }>(
+export const fetchEvents = createAsyncThunk<Event[], FetchEventsFilters, { rejectValue: FetchEventsError }>(
     'events/fetchEvents',
     async (filters: FetchEventsFilters, thunkAPI) => {
         const { city, date, eventType } = filters;
@@ -27,7 +42,7 @@ export const fetchEvents = createAsyncThunk<any[], FetchEventsFilters, { rejectV
         }).toString();
 
         try {
-            const response = await axios.get<any[]>(`${apiUrl}/events?${queryParams}`);
+            const response = await axios.get<Event[]>(`${apiUrl}/events?${queryParams}`);
             return response.data;
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -38,8 +53,9 @@ export const fetchEvents = createAsyncThunk<any[], FetchEventsFilters, { rejectV
     }
 );
 
+
 interface EventState {
-    events: any[];
+    events: Event[];
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
 }
@@ -61,7 +77,7 @@ const eventsSlice = createSlice({
             })
             .addCase(fetchEvents.fulfilled, (state, action) => {
                 state.status = 'succeeded';
-                state.events = action.payload;
+                state.events = action.payload; // Данные теперь должны быть типом Event[]
             })
             .addCase(fetchEvents.rejected, (state, action) => {
                 state.status = 'failed';

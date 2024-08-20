@@ -5,6 +5,7 @@ import { fetchEvents } from '@/store/slices/eventsSlice';
 import { RootState, AppDispatch } from '@/store';
 import Navbar from '@/components/Navbar';
 import EventFilter from '@/components/EventFilter';
+import { Event } from '@/store/slices/eventsSlice';
 
 interface Filters {
     city: string;
@@ -21,7 +22,7 @@ const getTomorrowDate = (): string => {
 const Events = () => {
     const isAuthenticated = useAuth();
     const dispatch = useDispatch<AppDispatch>();
-    const events = useSelector((state: RootState) => state.events.events);
+    const events = useSelector((state: RootState) => state.events.events as Event[]); // Убедитесь, что тип данных правильный
     const eventStatus = useSelector((state: RootState) => state.events.status);
     const errorMessage = useSelector((state: RootState) => state.events.error);
     const [filters, setFilters] = useState<Filters>({
@@ -43,7 +44,7 @@ const Events = () => {
     }, [dispatch, isAuthenticated]);
 
     const applyFilters = () => {
-        setDisplayFilters(filters); // Обновляем отображаемые фильтры
+        setDisplayFilters(filters);
         dispatch(fetchEvents(filters));
     };
 
@@ -78,8 +79,19 @@ const Events = () => {
             {eventStatus === 'loading' && <p>Loading...</p>}
             {eventStatus === 'succeeded' && (
                 <ul>
-                    {events.map((event: any) => (
-                        <li key={event.id}>{event.name}</li>
+                    {events.map((event: Event) => (
+                        <li key={event.id}>
+                            <h3>{event.name}</h3>
+                            <p><strong>Date:</strong> {event.date}</p>
+                            <p><strong>City:</strong> {event.city}</p>
+                            <p><strong>Type:</strong> {event.eventType}</p>
+                            {event.description && <p><strong>Description:</strong> {event.description}</p>}
+                            {event.venue && <p><strong>Venue:</strong> {event.venue}</p>}
+                            {event.url && <a href={event.url} target="_blank" rel="noopener noreferrer">More Info</a>}
+                            {event.imageUrl && <img src={event.imageUrl} alt={event.name} width={200} />}
+                            {event.priceRange && <p><strong>Price Range:</strong> {event.priceRange}</p>}
+                            {event.audience && <p><strong>Audience:</strong> {event.audience}</p>}
+                        </li>
                     ))}
                 </ul>
             )}
